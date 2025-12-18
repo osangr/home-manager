@@ -3,8 +3,8 @@ import { useRoute, RouterLink } from "vue-router";
 import { useProjectStore } from "../stores/projectStore";
 import { computed, onMounted, ref } from "vue";
 import BaseButton from "../components/ui/BaseButton.vue";
-import BaseCard from "../components/ui/BaseCard.vue";
 import { formatCurrency } from "../utils/formatters";
+import ProjectStatCard from "../components/features/projects/ProjectStatCard.vue";
 
 const route = useRoute();
 const projectStore = useProjectStore();
@@ -25,6 +25,11 @@ const tasksCount = ref(15);
 const completedTasks = ref(9);
 
 const project = computed(() => projectStore.currentProject);
+
+const progressPercentage = computed(() => {
+  if (tasksCount.value === 0) return 0;
+  return Math.round((completedTasks.value / tasksCount.value) * 100);
+});
 </script>
 
 <template>
@@ -70,48 +75,27 @@ const project = computed(() => projectStore.currentProject);
         </div>
       </div>
 
-      <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Presupuesto -->
-        <BaseCard>
-          <div class="text-center">
-            <p class="text-4xl mb-2">💰</p>
-            <p class="text-sm text-slate-600 mb-1">Presupuesto</p>
-            <p class="text-2xl font-bold text-slate-900">
-              {{ formatCurrency(project.total_budget) }}
-            </p>
-          </div>
-        </BaseCard>
+        <ProjectStatCard
+          icon="💰"
+          label="Presupuesto"
+          :value="formatCurrency(project.total_budget)"
+        />
 
-        <!-- Espacios (clickeable) -->
-        <RouterLink :to="`/project/${projectId}/spaces`" class="block">
-          <BaseCard hoverable>
-            <div class="text-center">
-              <p class="text-4xl mb-2">📐</p>
-              <p class="text-sm text-slate-600 mb-1">Espacios</p>
-              <p class="text-2xl font-bold text-slate-900">
-                {{ spacesCount }}
-              </p>
-            </div>
-          </BaseCard>
-        </RouterLink>
+        <ProjectStatCard
+          icon="📐"
+          label="Espacios"
+          :value="spacesCount"
+          :to="`/project/${projectId}/spaces`"
+        />
 
-        <!-- Tareas (clickeable) -->
-        <RouterLink :to="`/project/${projectId}/tasks`" class="block">
-          <BaseCard hoverable>
-            <div class="text-center">
-              <p class="text-4xl mb-2">📋</p>
-              <p class="text-sm text-slate-600 mb-1">Tareas</p>
-              <p class="text-2xl font-bold text-slate-900">
-                {{ completedTasks }} / {{ tasksCount }}
-              </p>
-              <p class="text-xs text-slate-500 mt-1">
-                {{ Math.round((completedTasks / tasksCount) * 100) }}%
-                completado
-              </p>
-            </div>
-          </BaseCard>
-        </RouterLink>
+        <ProjectStatCard
+          icon="📋"
+          label="Tareas"
+          :value="`${completedTasks} / ${tasksCount}`"
+          :to="`/project/${projectId}/tasks`"
+          :subtitle="`${progressPercentage}% completado`"
+        />
       </div>
     </div>
   </div>
