@@ -17,7 +17,7 @@
       <div class="space-y-1 mb-4">
         <div class="w-full bg-slate-200 rounded-full h-2">
           <div
-            class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            class="bg-primary h-2 rounded-full transition-all duration-300"
             :style="{ width: progressPercentage + '%' }"
           ></div>
         </div>
