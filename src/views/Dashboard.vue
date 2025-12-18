@@ -2,20 +2,32 @@
 import { onMounted } from "vue";
 import { useProjectStore } from "../stores/projectStore";
 import ProjectCard from "../components/features/projects/ProjectCard.vue";
+import { useRouter } from "vue-router";
 
 const projectStore = useProjectStore();
+const router = useRouter();
 
 onMounted(async () => {
   console.log("🔄 Cargando proyectos...");
   await projectStore.fetchProjects();
   console.log("✅ Proyectos cargados:", projectStore.projects);
 });
+
+const handleView = (id: string) => {
+  router.push(`/project/${id}`);
+};
+
+const handleSpaces = (id: string) => {
+  router.push(`/project/${id}/spaces`);
+};
+
+const handleTasks = (id: string) => {
+  router.push(`/project/${id}/tasks`);
+};
 </script>
 
 <template>
   <div class="p-8">
-    <h1 class="text-3xl font-bold text-slate-600 mb-6">Dashboard</h1>
-
     <!-- Resto del dashboard... -->
     <div v-if="projectStore.loading">Cargando proyectos...</div>
     <div v-else-if="projectStore.projects.length === 0">
@@ -30,9 +42,9 @@ onMounted(async () => {
         :spaces-count="5"
         :tasks-count="15"
         :completed-tasks="9"
-        @view="(id) => console.log('Ver:', id)"
-        @spaces="(id) => console.log('Espacios:', id)"
-        @tasks="(id) => console.log('Tareas:', id)"
+        @view="(id) => handleView(id)"
+        @spaces="(id) => handleSpaces(id)"
+        @tasks="(id) => handleTasks(id)"
       />
     </div>
   </div>

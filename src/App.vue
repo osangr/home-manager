@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { supabase } from "./lib/supabase";
 import { RouterView } from "vue-router";
+import AppLayout from "./components/layout/AppLayout.vue";
 
 onMounted(async () => {
   const { data } = await supabase.auth.getSession();
@@ -10,10 +11,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50">
-    <h1 class="text-4xl font-bold text-primary mb-2">Home Manager</h1>
+  <AppLayout>
     <RouterView />
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped></style>
