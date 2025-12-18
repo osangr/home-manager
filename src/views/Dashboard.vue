@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useProjectStore } from "../stores/projectStore";
+import ProjectCard from "../components/features/projects/ProjectCard.vue";
 
 const projectStore = useProjectStore();
 
@@ -22,15 +23,17 @@ onMounted(async () => {
     </div>
     <div v-else>
       <h2 class="text-xl font-semibold mb-3">Tus proyectos:</h2>
-      <ul class="space-y-2">
-        <li
-          v-for="project in projectStore.projects"
-          :key="project.id"
-          class="p-4 bg-white rounded-lg shadow"
-        >
-          {{ project.name }}
-        </li>
-      </ul>
+      <ProjectCard
+        v-for="project in projectStore.projects"
+        :key="project.id"
+        :project="project"
+        :spaces-count="5"
+        :tasks-count="15"
+        :completed-tasks="9"
+        @view="(id) => console.log('Ver:', id)"
+        @spaces="(id) => console.log('Espacios:', id)"
+        @tasks="(id) => console.log('Tareas:', id)"
+      />
     </div>
   </div>
 </template>
