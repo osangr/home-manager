@@ -69,9 +69,9 @@
 </template>
 
 <script setup lang="ts">
-import BaseInput from "../components/ui/BaseInput.vue";
-import BaseCard from "../components/ui/BaseCard.vue";
-import BaseButton from "../components/ui/BaseButton.vue";
+import BaseInput from "@/components/ui/BaseInput.vue";
+import BaseCard from "@/components/ui/BaseCard.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
 import { ref } from "vue";
 
 const name = ref("");
@@ -87,5 +87,3 @@ const validateEmail = () => {
   }
 };
 </script>
-
-<style lang="scss" scoped></style>

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { supabase } from "../lib/supabase";
-import type { Project, CreateProject } from "../types/database";
+import { supabase } from "@/lib/supabase";
+import type { Project, CreateProject } from "@/types/database";
 
 export const useProjectStore = defineStore("project", () => {
   const projects = ref<Project[]>([]);

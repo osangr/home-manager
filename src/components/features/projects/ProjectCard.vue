@@ -54,10 +54,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Project } from "../../../types/database";
-import BaseCard from "../../ui/BaseCard.vue";
-import BaseButton from "../../ui/BaseButton.vue";
-import { formatCurrency } from "../../../utils/formatters";
+import type { Project } from "@/types/database";
+import BaseCard from "@/components/ui/BaseCard.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
+import { formatCurrency } from "@/utils/formatters";
 
 interface ProjectCardProps {
   project: Project;

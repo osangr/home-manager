@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useRoute, RouterLink } from "vue-router";
-import { useProjectStore } from "../stores/projectStore";
+import { useRoute } from "vue-router";
+import { useProjectStore } from "@/stores/projectStore";
 import { computed, onMounted, ref } from "vue";
-import BaseButton from "../components/ui/BaseButton.vue";
-import { formatCurrency } from "../utils/formatters";
-import ProjectStatCard from "../components/features/projects/ProjectStatCard.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
+import { formatCurrency } from "@/utils/formatters";
+import ProjectStatCard from "@/components/features/projects/ProjectStatCard.vue";
 
 const route = useRoute();
 const projectStore = useProjectStore();

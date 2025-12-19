@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BaseCard from "../../ui/BaseCard.vue";
+import BaseCard from "@/components/ui/BaseCard.vue";
 
 interface ProjectStatCardProps {
   icon: string;

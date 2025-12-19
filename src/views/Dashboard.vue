@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useProjectStore } from "../stores/projectStore";
-import ProjectCard from "../components/features/projects/ProjectCard.vue";
 import { useRouter } from "vue-router";
+import { useProjectStore } from "@/stores/projectStore";
+import ProjectCard from "@/components/features/projects/ProjectCard.vue";
 
 const projectStore = useProjectStore();
 const router = useRouter();
