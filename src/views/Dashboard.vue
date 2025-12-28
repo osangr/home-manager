@@ -8,9 +8,7 @@ const projectStore = useProjectStore();
 const router = useRouter();
 
 onMounted(async () => {
-  console.log("🔄 Cargando proyectos...");
   await projectStore.fetchProjects();
-  console.log("✅ Proyectos cargados:", projectStore.projects);
 });
 
 const handleView = (id: string) => {
@@ -28,13 +26,12 @@ const handleTasks = (id: string) => {
 
 <template>
   <div class="p-8">
-    <!-- Resto del dashboard... -->
+    <h1 class="text-3xl font-semibold mb-3">Dashboard</h1>
     <div v-if="projectStore.loading">Cargando proyectos...</div>
     <div v-else-if="projectStore.projects.length === 0">
       No tienes proyectos todavía.
     </div>
-    <div v-else>
-      <h2 class="text-xl font-semibold mb-3">Tus proyectos:</h2>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <ProjectCard
         v-for="project in projectStore.projects"
         :key="project.id"
@@ -42,9 +39,9 @@ const handleTasks = (id: string) => {
         :spaces-count="5"
         :tasks-count="15"
         :completed-tasks="9"
-        @view="(id) => handleView(id)"
-        @spaces="(id) => handleSpaces(id)"
-        @tasks="(id) => handleTasks(id)"
+        @view="handleView"
+        @spaces="handleSpaces"
+        @tasks="handleTasks"
       />
     </div>
   </div>
