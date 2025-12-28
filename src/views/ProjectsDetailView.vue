@@ -5,19 +5,19 @@ import { computed, onMounted, ref } from "vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { formatCurrency } from "@/utils/formatters";
 import ProjectStatCard from "@/components/features/projects/ProjectStatCard.vue";
+import BaseModal from "@/components/ui/BaseModal.vue";
+import ProjectForm from "@/components/features/projects/ProjectForm.vue";
+import type { CreateProject } from "@/types/database";
 
 const route = useRoute();
 const projectStore = useProjectStore();
+const isUpdateOption = ref(false);
+const isRemoveOption = ref(false);
 
 const projectId = route.params.id as string;
 
 onMounted(async () => {
-  console.log("🔄 Cargando detalles del proyecto...");
   await projectStore.fetchProjectById(projectId);
-  console.log(
-    "✅ Detalles del proyecto cargados:",
-    projectStore.currentProject
-  );
 });
 
 const spacesCount = ref(5);
@@ -30,6 +30,20 @@ const progressPercentage = computed(() => {
   if (tasksCount.value === 0) return 0;
   return Math.round((completedTasks.value / tasksCount.value) * 100);
 });
+
+const handleEdit = async (data: CreateProject) => {
+  isUpdateOption.value = true;
+  console.log("Editar proyecto:", data);
+
+  await projectStore.updateProject(projectId, data);
+
+  isUpdateOption.value = false;
+};
+
+const handleDelete = async () => {
+  isRemoveOption.value = true;
+  console.log("Eliminar proyecto:", projectId);
+};
 </script>
 
 <template>
@@ -61,14 +75,14 @@ const progressPercentage = computed(() => {
           <BaseButton
             size="small"
             variant="secondary"
-            @click="console.log('Editar:', project.id)"
+            @click="isUpdateOption = true"
           >
             Editar
           </BaseButton>
           <BaseButton
             size="small"
             variant="danger"
-            @click="console.log('Eliminar:', project.id)"
+            @click="isRemoveOption = true"
           >
             Eliminar
           </BaseButton>
@@ -97,6 +111,39 @@ const progressPercentage = computed(() => {
           :subtitle="`${progressPercentage}% completado`"
         />
       </div>
+      <BaseModal
+        :is-open="isUpdateOption"
+        title="Editar Proyecto"
+        @close="isUpdateOption = false"
+      >
+        <ProjectForm
+          :project="project"
+          @cancel="isUpdateOption = false"
+          @submit="handleEdit"
+        />
+      </BaseModal>
+
+      <BaseModal
+        :is-open="isRemoveOption"
+        title="Eliminar Proyecto"
+        size="small"
+        @close="isRemoveOption = false"
+      >
+        <div class="p-4">
+          <p class="mb-4">
+            ¿Estás seguro de que deseas eliminar este proyecto? Esta acción no
+            se puede deshacer.
+          </p>
+          <div class="flex justify-end gap-2">
+            <BaseButton variant="secondary" @click="isRemoveOption = false">
+              Cancelar
+            </BaseButton>
+            <BaseButton variant="danger" @click="handleDelete">
+              Eliminar
+            </BaseButton>
+          </div>
+        </div>
+      </BaseModal>
     </div>
   </div>
 </template>
