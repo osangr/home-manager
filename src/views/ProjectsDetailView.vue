@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
 import { computed, onMounted, ref } from "vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
@@ -10,6 +10,7 @@ import ProjectForm from "@/components/features/projects/ProjectForm.vue";
 import type { CreateProject } from "@/types/database";
 
 const route = useRoute();
+const router = useRouter();
 const projectStore = useProjectStore();
 const isUpdateOption = ref(false);
 const isRemoveOption = ref(false);
@@ -33,7 +34,6 @@ const progressPercentage = computed(() => {
 
 const handleEdit = async (data: CreateProject) => {
   isUpdateOption.value = true;
-  console.log("Editar proyecto:", data);
 
   await projectStore.updateProject(projectId, data);
 
@@ -42,7 +42,12 @@ const handleEdit = async (data: CreateProject) => {
 
 const handleDelete = async () => {
   isRemoveOption.value = true;
-  console.log("Eliminar proyecto:", projectId);
+  const success = await projectStore.deleteProject(projectId);
+
+  if (success) {
+    router.push("/");
+  }
+  isRemoveOption.value = false;
 };
 </script>
 

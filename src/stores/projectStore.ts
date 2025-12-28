@@ -133,6 +133,34 @@ export const useProjectStore = defineStore("project", () => {
     return null;
   };
 
+  const deleteProject = async (id: string): Promise<boolean> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const { error: deleteError } = await supabase
+        .from("projects")
+        .delete()
+        .eq("id", id);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      projects.value = projects.value.filter((proj) => proj.id !== id);
+
+      if (currentProject.value?.id === id) {
+        currentProject.value = null;
+      }
+      return true;
+    } catch (err) {
+      error.value = (err as Error).message;
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     // State
     projects,
@@ -145,5 +173,6 @@ export const useProjectStore = defineStore("project", () => {
     fetchProjectById,
     createProject,
     updateProject,
+    deleteProject,
   };
 });
