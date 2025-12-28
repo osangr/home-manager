@@ -95,6 +95,44 @@ export const useProjectStore = defineStore("project", () => {
     }
   };
 
+  const updateProject = async (
+    id: string,
+    updates: Partial<Project>
+  ): Promise<Project | null> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const { data, error: updateError } = await supabase
+        .from("projects")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (updateError) {
+        throw updateError;
+      }
+      if (!data) {
+        throw new Error("Error al actualizar el proyecto");
+      }
+
+      const index = projects.value.findIndex((proj) => proj.id === id);
+      if (index !== -1) {
+        projects.value[index] = data;
+      }
+      if (currentProject.value?.id === id) {
+        currentProject.value = data;
+      }
+    } catch (err) {
+      error.value = (err as Error).message;
+      return null;
+    } finally {
+      loading.value = false;
+    }
+    return null;
+  };
+
   return {
     // State
     projects,
@@ -106,5 +144,6 @@ export const useProjectStore = defineStore("project", () => {
     fetchProjects,
     fetchProjectById,
     createProject,
+    updateProject,
   };
 });
