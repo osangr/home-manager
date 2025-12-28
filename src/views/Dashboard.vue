@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
 import ProjectCard from "@/components/features/projects/ProjectCard.vue";
+import BaseButton from "@/components/ui/BaseButton.vue";
+import BaseModal from "@/components/ui/BaseModal.vue";
+import ProjectForm from "@/components/features/projects/ProjectForm.vue";
+import type { CreateProject } from "@/types/database";
+
+const isModalOpen = ref(false);
 
 const projectStore = useProjectStore();
 const router = useRouter();
@@ -21,6 +27,17 @@ const handleSpaces = (id: string) => {
 
 const handleTasks = (id: string) => {
   router.push(`/project/${id}/tasks`);
+};
+
+const handleModal = () => {
+  isModalOpen.value = !isModalOpen.value;
+};
+
+const handleProjectCreated = async (data: CreateProject) => {
+  console.log("Proyecto creado", data);
+
+  await projectStore.createProject(data);
+  handleModal();
 };
 </script>
 
@@ -45,4 +62,15 @@ const handleTasks = (id: string) => {
       />
     </div>
   </div>
+  <BaseButton class="mt-6" @click="handleModal" variant="primary">
+    Crear Nuevo Proyecto
+  </BaseButton>
+  <BaseModal
+    :is-open="isModalOpen"
+    title="Crear Nuevo Proyecto"
+    size="medium"
+    @close="handleModal"
+  >
+    <ProjectForm @submit="handleProjectCreated" @cancel="handleModal" />
+  </BaseModal>
 </template>

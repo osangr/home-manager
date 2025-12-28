@@ -54,24 +54,42 @@ export const useProjectStore = defineStore("project", () => {
     }
   };
 
-  const createProject = async (project: CreateProject) => {
+  const createProject = async (
+    project: CreateProject
+  ): Promise<Project | null> => {
     loading.value = true;
     error.value = null;
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+
+    if (!userId) {
+      error.value = "Usuario no encontrado";
+      loading.value = false;
+      return null;
+    }
 
     try {
       const { data, error: insertError } = await supabase
         .from("projects")
-        .insert([project])
+        .insert({
+          ...project,
+          user_id: userId,
+        })
+        .select()
         .single();
 
       if (insertError) {
         throw insertError;
       }
-
+      if (!data) {
+        throw new Error("Error al crear el proyecto");
+      }
       projects.value.unshift(data as Project);
-      return data;
+      return data as Project | null;
     } catch (err) {
       error.value = (err as Error).message;
+      return null;
     } finally {
       loading.value = false;
     }

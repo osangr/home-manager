@@ -38,7 +38,10 @@ export type Task = {
 };
 
 // Tipos para crear (sin id, created_at, updated_at)
-export type CreateProject = Omit<Project, "id" | "created_at" | "updated_at">;
+export type CreateProject = Omit<
+  Project,
+  "id" | "created_at" | "updated_at" | "user_id"
+>;
 export type CreateSpace = Omit<Space, "id" | "created_at" | "updated_at">;
 export type CreateTask = Omit<Task, "id" | "created_at" | "updated_at">;
 
