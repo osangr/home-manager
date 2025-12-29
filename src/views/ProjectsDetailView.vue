@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
+import { useSpacesStore } from "@/stores/spaceStorage";
+import { useTaskStore } from "@/stores/taskStore";
 import { computed, onMounted, ref } from "vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { formatCurrency } from "@/utils/formatters";
@@ -12,18 +14,26 @@ import type { CreateProject } from "@/types/database";
 const route = useRoute();
 const router = useRouter();
 const projectStore = useProjectStore();
+const spaceStore = useSpacesStore();
+const taskStore = useTaskStore();
 const isUpdateOption = ref(false);
 const isRemoveOption = ref(false);
 
 const projectId = route.params.id as string;
 
 onMounted(async () => {
-  await projectStore.fetchProjectById(projectId);
+  await Promise.all([
+    projectStore.fetchProjectById(projectId),
+    spaceStore.fetchSpacesByProject(projectId),
+    taskStore.fetchTasksByProject(projectId),
+  ]);
 });
 
-const spacesCount = ref(5);
-const tasksCount = ref(15);
-const completedTasks = ref(9);
+const spacesCount = computed(() => spaceStore.spaces.length);
+const tasksCount = computed(() => taskStore.tasks.length);
+const completedTasks = computed(
+  () => taskStore.tasks.filter((t) => t.status === "completed").length
+);
 
 const project = computed(() => projectStore.currentProject);
 
