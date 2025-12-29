@@ -61,6 +61,14 @@ const handleDelete = async () => {
 
 <template>
   <div class="p-8">
+    <BaseButton
+      variant="ghost"
+      size="small"
+      @click="router.back()"
+      class="mb-4"
+    >
+      ← Volver
+    </BaseButton>
     <h1 class="text-3xl font-bold text-slate-900 mb-8">Detalle del Proyecto</h1>
 
     <!-- Loading -->
