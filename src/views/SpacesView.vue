@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
 import { useSpacesStore } from "@/stores/spaceStorage";
+import { useTaskStore } from "@/stores/taskStore";
 import SpaceCard from "@/components/features/spaces/SpaceCard.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
@@ -13,6 +14,7 @@ const router = useRouter();
 const route = useRoute();
 const projectStore = useProjectStore();
 const spaceStore = useSpacesStore();
+const taskStore = useTaskStore();
 
 const projectId = route.params.id as string;
 
@@ -65,6 +67,16 @@ const openDeleteModal = (id: string) => {
 const handleViewTasks = (id: string) => {
   router.push(`/project/${projectId}/spaces/${id}/tasks`);
 };
+
+const getSpaceTasksCount = (id: string) => {
+  return taskStore.tasks.filter((task) => task.space_id === id).length;
+};
+
+const getSpaceCompleteTasksCount = (id: string) => {
+  return taskStore.tasks.filter(
+    (task) => task.space_id === id && task.status === "completed"
+  ).length;
+};
 </script>
 
 <template>
@@ -115,8 +127,8 @@ const handleViewTasks = (id: string) => {
         v-for="space in spaceStore.spaces"
         :key="space.id"
         :space="space"
-        :tasks-count="5"
-        :completed-tasks="2"
+        :tasks-count="getSpaceTasksCount(space.id)"
+        :completed-tasks="getSpaceCompleteTasksCount(space.id)"
         @view="handleViewTasks"
         @edit="openEditModal"
         @delete="openDeleteModal"

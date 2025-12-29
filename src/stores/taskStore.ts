@@ -31,6 +31,41 @@ export const useTaskStore = defineStore("task", () => {
     }
   };
 
+  const fetchTasksByProject = async (projectId: string): Promise<void> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const { data: spacesData, error: spacesError } = await supabase
+        .from("spaces")
+        .select("id")
+        .eq("project_id", projectId);
+
+      if (spacesError) throw spacesError;
+
+      const spaceIds = spacesData?.map((s) => s.id) || [];
+
+      if (spaceIds.length === 0) {
+        tasks.value = [];
+        return;
+      }
+
+      const { data, error: fetchError } = await supabase
+        .from("tasks")
+        .select("*")
+        .in("space_id", spaceIds)
+        .order("created_at", { ascending: false });
+
+      if (fetchError) throw fetchError;
+
+      tasks.value = data || [];
+    } catch (err) {
+      error.value = (err as Error).message;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const createTask = async (task: CreateTask): Promise<Task | null> => {
     loading.value = true;
     error.value = null;
@@ -153,6 +188,7 @@ export const useTaskStore = defineStore("task", () => {
 
     //Actions
     fetchTaskBySpace,
+    fetchTasksByProject,
     createTask,
     updateTask,
     deleteTask,
