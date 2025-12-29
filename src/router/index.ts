@@ -23,7 +23,7 @@ const router = createRouter({
       component: SpacesView,
     },
     {
-      path: "/project/:id/tasks",
+      path: "/project/:id/spaces/:spaceId/tasks",
       name: "projects-tasks",
       component: TasksView,
     },

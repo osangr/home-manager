@@ -112,7 +112,6 @@ const handleDelete = async () => {
           icon="📋"
           label="Tareas"
           :value="`${completedTasks} / ${tasksCount}`"
-          :to="`/project/${projectId}/tasks`"
           :subtitle="`${progressPercentage}% completado`"
         />
       </div>
