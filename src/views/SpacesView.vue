@@ -27,6 +27,7 @@ onMounted(async () => {
   await Promise.all([
     projectStore.fetchProjectById(projectId),
     spaceStore.fetchSpacesByProject(projectId),
+    taskStore.fetchTasksByProject(projectId),
   ]);
 });
 
