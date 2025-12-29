@@ -3,21 +3,22 @@ import { useRoute, useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
 import { useSpacesStore } from "@/stores/spaceStorage";
 import { useTaskStore } from "@/stores/taskStore";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted } from "vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { formatCurrency } from "@/utils/formatters";
 import ProjectStatCard from "@/components/features/projects/ProjectStatCard.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import ProjectForm from "@/components/features/projects/ProjectForm.vue";
 import type { CreateProject } from "@/types/database";
+import { useModal } from "@/composables/useModal";
 
 const route = useRoute();
 const router = useRouter();
 const projectStore = useProjectStore();
 const spaceStore = useSpacesStore();
 const taskStore = useTaskStore();
-const isUpdateOption = ref(false);
-const isRemoveOption = ref(false);
+const editModal = useModal();
+const deleteModal = useModal();
 
 const projectId = route.params.id as string;
 
@@ -43,21 +44,18 @@ const progressPercentage = computed(() => {
 });
 
 const handleEdit = async (data: CreateProject) => {
-  isUpdateOption.value = true;
-
   await projectStore.updateProject(projectId, data);
 
-  isUpdateOption.value = false;
+  editModal.close();
 };
 
 const handleDelete = async () => {
-  isRemoveOption.value = true;
   const success = await projectStore.deleteProject(projectId);
 
   if (success) {
     router.push("/");
   }
-  isRemoveOption.value = false;
+  deleteModal.close();
 };
 </script>
 
@@ -90,15 +88,11 @@ const handleDelete = async () => {
           <BaseButton
             size="small"
             variant="secondary"
-            @click="isUpdateOption = true"
+            @click="editModal.open()"
           >
             Editar
           </BaseButton>
-          <BaseButton
-            size="small"
-            variant="danger"
-            @click="isRemoveOption = true"
-          >
+          <BaseButton size="small" variant="danger" @click="deleteModal.open()">
             Eliminar
           </BaseButton>
         </div>
@@ -126,22 +120,22 @@ const handleDelete = async () => {
         />
       </div>
       <BaseModal
-        :is-open="isUpdateOption"
+        :is-open="editModal.isOpen.value"
         title="Editar Proyecto"
-        @close="isUpdateOption = false"
+        @close="editModal.close()"
       >
         <ProjectForm
           :project="project"
-          @cancel="isUpdateOption = false"
+          @cancel="editModal.close()"
           @submit="handleEdit"
         />
       </BaseModal>
 
       <BaseModal
-        :is-open="isRemoveOption"
+        :is-open="deleteModal.isOpen.value"
         title="Eliminar Proyecto"
         size="small"
-        @close="isRemoveOption = false"
+        @close="deleteModal.close()"
       >
         <div class="p-4">
           <p class="mb-4">
@@ -149,7 +143,7 @@ const handleDelete = async () => {
             se puede deshacer.
           </p>
           <div class="flex justify-end gap-2">
-            <BaseButton variant="secondary" @click="isRemoveOption = false">
+            <BaseButton variant="secondary" @click="deleteModal.close()">
               Cancelar
             </BaseButton>
             <BaseButton variant="danger" @click="handleDelete">

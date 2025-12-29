@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTaskStore } from "@/stores/taskStore";
 import { useSpacesStore } from "@/stores/spaceStorage";
@@ -8,19 +8,18 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import TaskForm from "@/components/features/tasks/TaskForm.vue";
 import type { CreateTask } from "@/types/database";
+import { useModal } from "@/composables/useModal";
 
 const route = useRoute();
 const router = useRouter();
 const taskStore = useTaskStore();
 const spaceStore = useSpacesStore();
+const createModal = useModal();
+const editModal = useModal();
+const deleteModal = useModal();
 
 const projectId = route.params.id as string;
 const spaceId = route.params.spaceId as string;
-
-const isCreateModalOpen = ref(false);
-const isEditModalOpen = ref(false);
-const isDeleteModalOpen = ref(false);
-const selectedTaskId = ref<string | null>(null);
 
 onMounted(async () => {
   await Promise.all([
@@ -48,37 +47,29 @@ const completedTasks = computed(() =>
 );
 
 const selectedTask = computed(() =>
-  taskStore.tasks.find((t) => t.id === selectedTaskId.value)
+  taskStore.tasks.find((t) => t.id === editModal.selectedItemId.value)
+);
+
+const selectedTaskToDelete = computed(() =>
+  taskStore.tasks.find((t) => t.id === deleteModal.selectedItemId.value)
 );
 
 // Handlers
 const handleCreate = async (data: CreateTask) => {
   await taskStore.createTask(data);
-  isCreateModalOpen.value = false;
+  createModal.close();
 };
 
 const handleEdit = async (data: CreateTask) => {
-  if (!selectedTaskId.value) return;
-  await taskStore.updateTask(selectedTaskId.value, data);
-  isEditModalOpen.value = false;
-  selectedTaskId.value = null;
+  if (!editModal.selectedItemId.value) return;
+  await taskStore.updateTask(editModal.selectedItemId.value, data);
+  editModal.close();
 };
 
 const handleDelete = async () => {
-  if (!selectedTaskId.value) return;
-  await taskStore.deleteTask(selectedTaskId.value);
-  isDeleteModalOpen.value = false;
-  selectedTaskId.value = null;
-};
-
-const openEditModal = (id: string) => {
-  selectedTaskId.value = id;
-  isEditModalOpen.value = true;
-};
-
-const openDeleteModal = (id: string) => {
-  selectedTaskId.value = id;
-  isDeleteModalOpen.value = true;
+  if (!deleteModal.selectedItemId.value) return;
+  await taskStore.deleteTask(deleteModal.selectedItemId.value);
+  deleteModal.close();
 };
 </script>
 
@@ -105,7 +96,7 @@ const openDeleteModal = (id: string) => {
           </p>
         </div>
 
-        <BaseButton @click="isCreateModalOpen = true" variant="primary">
+        <BaseButton @click="createModal.open()" variant="primary">
           + Nueva Tarea
         </BaseButton>
       </div>
@@ -120,7 +111,7 @@ const openDeleteModal = (id: string) => {
     <!-- Lista vacía -->
     <div v-else-if="taskStore.tasks.length === 0" class="text-center py-12">
       <p class="text-slate-600 mb-4">No hay tareas todavía</p>
-      <BaseButton @click="isCreateModalOpen = true" variant="primary">
+      <BaseButton @click="createModal.open()" variant="primary">
         Crear primera tarea
       </BaseButton>
     </div>
@@ -137,8 +128,8 @@ const openDeleteModal = (id: string) => {
             v-for="task in pendingTasks"
             :key="task.id"
             :task="task"
-            @edit="openEditModal"
-            @delete="openDeleteModal"
+            @edit="editModal.open"
+            @delete="deleteModal.open"
           />
         </div>
       </div>
@@ -153,8 +144,8 @@ const openDeleteModal = (id: string) => {
             v-for="task in inProgressTasks"
             :key="task.id"
             :task="task"
-            @edit="openEditModal"
-            @delete="openDeleteModal"
+            @edit="editModal.open"
+            @delete="deleteModal.open"
           />
         </div>
       </div>
@@ -169,8 +160,8 @@ const openDeleteModal = (id: string) => {
             v-for="task in completedTasks"
             :key="task.id"
             :task="task"
-            @edit="openEditModal"
-            @delete="openDeleteModal"
+            @edit="editModal.open"
+            @delete="deleteModal.open"
           />
         </div>
       </div>
@@ -179,47 +170,47 @@ const openDeleteModal = (id: string) => {
     <!-- 3. Modales -->
     <!-- Modal Crear Tarea -->
     <BaseModal
-      :is-open="isCreateModalOpen"
+      :is-open="createModal.isOpen.value"
       title="Nueva Tarea"
-      @close="isCreateModalOpen = false"
+      @close="createModal.close()"
     >
       <TaskForm
         :space-id="spaceId"
         @submit="handleCreate"
-        @cancel="isCreateModalOpen = false"
+        @cancel="createModal.close()"
       />
     </BaseModal>
 
     <!-- Modal Editar Tarea -->
     <BaseModal
-      :is-open="isEditModalOpen"
+      :is-open="editModal.isOpen.value"
       title="Editar Tarea"
-      @close="isEditModalOpen = false"
+      @close="editModal.close()"
     >
       <TaskForm
         v-if="selectedTask"
         :task="selectedTask"
         :space-id="spaceId"
         @submit="handleEdit"
-        @cancel="isEditModalOpen = false"
+        @cancel="editModal.close()"
       />
     </BaseModal>
 
     <!-- Modal Eliminar Tarea -->
     <BaseModal
-      :is-open="isDeleteModalOpen"
+      :is-open="deleteModal.isOpen.value"
       title="Eliminar Tarea"
       size="small"
-      @close="isDeleteModalOpen = false"
+      @close="deleteModal.close()"
     >
       <div class="p-4">
         <p class="mb-4 text-slate-600">
           ¿Estás seguro de que deseas eliminar
-          <strong>{{ selectedTask?.title }}</strong
+          <strong>{{ selectedTaskToDelete?.title }}</strong
           >? Esta acción no se puede deshacer.
         </p>
         <div class="flex justify-end gap-2">
-          <BaseButton variant="secondary" @click="isDeleteModalOpen = false">
+          <BaseButton variant="secondary" @click="deleteModal.close()">
             Cancelar
           </BaseButton>
           <BaseButton variant="danger" @click="handleDelete">
