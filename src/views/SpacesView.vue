@@ -10,6 +10,7 @@ import BaseModal from "@/components/ui/BaseModal.vue";
 import SpaceForm from "@/components/features/spaces/SpaceForm.vue";
 import type { CreateSpace } from "@/types/database";
 import { useModal } from "@/composables/useModal";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -159,27 +160,12 @@ const getSpaceCompleteTasksCount = (id: string) => {
     </BaseModal>
 
     <!-- Modal Eliminar Espacio -->
-    <BaseModal
+    <ConfirmDeleteModal
       :is-open="deleteModal.isOpen.value"
       title="Eliminar Espacio"
-      size="small"
-      @close="deleteModal.close()"
-    >
-      <div class="p-4">
-        <p class="mb-4 text-slate-600">
-          ¿Estás seguro de que deseas eliminar
-          <strong>{{ selectedSpaceToDelete?.name }}</strong
-          >? Esta acción no se puede deshacer.
-        </p>
-        <div class="flex justify-end gap-2">
-          <BaseButton variant="secondary" @click="deleteModal.close()">
-            Cancelar
-          </BaseButton>
-          <BaseButton variant="danger" @click="handleDelete">
-            Eliminar
-          </BaseButton>
-        </div>
-      </div>
-    </BaseModal>
+      :item-name="selectedSpaceToDelete?.name"
+      @confirm="handleDelete"
+      @cancel="deleteModal.close()"
+    />
   </div>
 </template>

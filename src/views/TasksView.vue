@@ -9,6 +9,7 @@ import BaseModal from "@/components/ui/BaseModal.vue";
 import TaskForm from "@/components/features/tasks/TaskForm.vue";
 import type { CreateTask } from "@/types/database";
 import { useModal } from "@/composables/useModal";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -197,27 +198,12 @@ const handleDelete = async () => {
     </BaseModal>
 
     <!-- Modal Eliminar Tarea -->
-    <BaseModal
+    <ConfirmDeleteModal
       :is-open="deleteModal.isOpen.value"
       title="Eliminar Tarea"
-      size="small"
-      @close="deleteModal.close()"
-    >
-      <div class="p-4">
-        <p class="mb-4 text-slate-600">
-          ¿Estás seguro de que deseas eliminar
-          <strong>{{ selectedTaskToDelete?.title }}</strong
-          >? Esta acción no se puede deshacer.
-        </p>
-        <div class="flex justify-end gap-2">
-          <BaseButton variant="secondary" @click="deleteModal.close()">
-            Cancelar
-          </BaseButton>
-          <BaseButton variant="danger" @click="handleDelete">
-            Eliminar
-          </BaseButton>
-        </div>
-      </div>
-    </BaseModal>
+      :item-name="selectedTaskToDelete?.title"
+      @confirm="handleDelete"
+      @cancel="deleteModal.close()"
+    />
   </div>
 </template>

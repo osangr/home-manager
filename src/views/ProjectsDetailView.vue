@@ -9,6 +9,7 @@ import { formatCurrency } from "@/utils/formatters";
 import ProjectStatCard from "@/components/features/projects/ProjectStatCard.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import ProjectForm from "@/components/features/projects/ProjectForm.vue";
+import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal.vue";
 import type { CreateProject } from "@/types/database";
 import { useModal } from "@/composables/useModal";
 
@@ -139,27 +140,13 @@ const handleDelete = async () => {
         />
       </BaseModal>
 
-      <BaseModal
+      <ConfirmDeleteModal
         :is-open="deleteModal.isOpen.value"
         title="Eliminar Proyecto"
-        size="small"
-        @close="deleteModal.close()"
-      >
-        <div class="p-4">
-          <p class="mb-4">
-            ¿Estás seguro de que deseas eliminar este proyecto? Esta acción no
-            se puede deshacer.
-          </p>
-          <div class="flex justify-end gap-2">
-            <BaseButton variant="secondary" @click="deleteModal.close()">
-              Cancelar
-            </BaseButton>
-            <BaseButton variant="danger" @click="handleDelete">
-              Eliminar
-            </BaseButton>
-          </div>
-        </div>
-      </BaseModal>
+        :item-name="project?.name"
+        @confirm="handleDelete"
+        @cancel="deleteModal.close()"
+      />
     </div>
   </div>
 </template>
