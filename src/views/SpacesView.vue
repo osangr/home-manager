@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
 import { useSpacesStore } from "@/stores/spaceStorage";
@@ -9,19 +9,18 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import SpaceForm from "@/components/features/spaces/SpaceForm.vue";
 import type { CreateSpace } from "@/types/database";
+import { useModal } from "@/composables/useModal";
 
 const router = useRouter();
 const route = useRoute();
 const projectStore = useProjectStore();
 const spaceStore = useSpacesStore();
 const taskStore = useTaskStore();
+const createModal = useModal();
+const editModal = useModal();
+const deleteModal = useModal();
 
 const projectId = route.params.id as string;
-
-const isCreateModalOpen = ref(false);
-const isEditModalOpen = ref(false);
-const isDeleteModalOpen = ref(false);
-const selectedSpaceId = ref<string | null>(null);
 
 onMounted(async () => {
   await Promise.all([
@@ -32,37 +31,32 @@ onMounted(async () => {
 });
 
 const project = computed(() => projectStore.currentProject);
+
 const selectedSpace = computed(() =>
-  spaceStore.spaces.find((space) => space.id === selectedSpaceId.value)
+  spaceStore.spaces.find((space) => space.id === editModal.selectedItemId.value)
+);
+
+const selectedSpaceToDelete = computed(() =>
+  spaceStore.spaces.find(
+    (space) => space.id === deleteModal.selectedItemId.value
+  )
 );
 
 const handleCreate = async (data: CreateSpace) => {
   await spaceStore.createSpace(data);
-  isCreateModalOpen.value = false;
+  createModal.close();
 };
 
 const handleEdit = async (data: CreateSpace) => {
-  if (!selectedSpaceId.value) return;
-  await spaceStore.updateSpace(selectedSpaceId.value, data);
-  isEditModalOpen.value = false;
-  selectedSpaceId.value = null;
+  if (!editModal.selectedItemId.value) return;
+  await spaceStore.updateSpace(editModal.selectedItemId.value, data);
+  editModal.close();
 };
 
 const handleDelete = async () => {
-  if (!selectedSpaceId.value) return;
-  await spaceStore.deleteSpace(selectedSpaceId.value);
-  isDeleteModalOpen.value = false;
-  selectedSpaceId.value = null;
-};
-
-const openEditModal = (id: string) => {
-  selectedSpaceId.value = id;
-  isEditModalOpen.value = true;
-};
-
-const openDeleteModal = (id: string) => {
-  selectedSpaceId.value = id;
-  isDeleteModalOpen.value = true;
+  if (!deleteModal.selectedItemId.value) return;
+  await spaceStore.deleteSpace(deleteModal.selectedItemId.value);
+  deleteModal.close();
 };
 
 const handleViewTasks = (id: string) => {
@@ -103,7 +97,7 @@ const getSpaceCompleteTasksCount = (id: string) => {
           </p>
         </div>
 
-        <BaseButton @click="isCreateModalOpen = true" variant="primary">
+        <BaseButton @click="createModal.open()" variant="primary">
           + Nuevo Espacio
         </BaseButton>
       </div>
@@ -117,7 +111,7 @@ const getSpaceCompleteTasksCount = (id: string) => {
     <!-- Lista vacía -->
     <div v-else-if="spaceStore.spaces.length === 0" class="text-center py-12">
       <p class="text-slate-600 mb-4">No hay espacios todavía</p>
-      <BaseButton @click="isCreateModalOpen = true" variant="primary">
+      <BaseButton @click="createModal.open()" variant="primary">
         Crear primer espacio
       </BaseButton>
     </div>
@@ -131,54 +125,54 @@ const getSpaceCompleteTasksCount = (id: string) => {
         :tasks-count="getSpaceTasksCount(space.id)"
         :completed-tasks="getSpaceCompleteTasksCount(space.id)"
         @view="handleViewTasks"
-        @edit="openEditModal"
-        @delete="openDeleteModal"
+        @edit="editModal.open"
+        @delete="deleteModal.open"
       />
     </div>
     <!-- 3. Modales -->
     <!-- Modal Crear Espacio -->
     <BaseModal
-      :is-open="isCreateModalOpen"
+      :is-open="createModal.isOpen.value"
       title="Nuevo Espacio"
-      @close="isCreateModalOpen = false"
+      @close="createModal.close()"
     >
       <SpaceForm
         :project-id="projectId"
         @submit="handleCreate"
-        @cancel="isCreateModalOpen = false"
+        @cancel="createModal.close()"
       />
     </BaseModal>
 
     <!-- Modal Editar Espacio -->
     <BaseModal
-      :is-open="isEditModalOpen"
+      :is-open="editModal.isOpen.value"
       title="Editar Espacio"
-      @close="isEditModalOpen = false"
+      @close="editModal.close()"
     >
       <SpaceForm
         v-if="selectedSpace"
         :space="selectedSpace"
         :project-id="projectId"
         @submit="handleEdit"
-        @cancel="isEditModalOpen = false"
+        @cancel="editModal.close()"
       />
     </BaseModal>
 
     <!-- Modal Eliminar Espacio -->
     <BaseModal
-      :is-open="isDeleteModalOpen"
+      :is-open="deleteModal.isOpen.value"
       title="Eliminar Espacio"
       size="small"
-      @close="isDeleteModalOpen = false"
+      @close="deleteModal.close()"
     >
       <div class="p-4">
         <p class="mb-4 text-slate-600">
           ¿Estás seguro de que deseas eliminar
-          <strong>{{ selectedSpace?.name }}</strong
+          <strong>{{ selectedSpaceToDelete?.name }}</strong
           >? Esta acción no se puede deshacer.
         </p>
         <div class="flex justify-end gap-2">
-          <BaseButton variant="secondary" @click="isDeleteModalOpen = false">
+          <BaseButton variant="secondary" @click="deleteModal.close()">
             Cancelar
           </BaseButton>
           <BaseButton variant="danger" @click="handleDelete">
