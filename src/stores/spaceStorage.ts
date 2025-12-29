@@ -3,7 +3,7 @@ import type { CreateSpace, Space } from "@/types/database";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-export const useSpaceStore = defineStore("space", () => {
+export const useSpacesStore = defineStore("space", () => {
   const spaces = ref<Space[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
