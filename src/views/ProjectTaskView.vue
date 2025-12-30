@@ -200,7 +200,7 @@ const handleDelete = async () => {
     >
       <TaskForm
         v-if="defaultSpaceId"
-        :space-id="defaultSpaceId"
+        :project-id="projectId"
         @submit="handleCreate"
         @cancel="createModal.close()"
       />

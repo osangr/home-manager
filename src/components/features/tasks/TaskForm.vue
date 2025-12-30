@@ -7,17 +7,16 @@ import type {
   TaskPriority,
   TaskStatus,
 } from "@/types/database";
-import { ref, watch } from "vue";
+import { computed, reactive, watch } from "vue";
+import { useSpacesStore } from "@/stores/spaceStorage";
 
 interface TaskFormProps {
   task?: Task;
-  spaceId: string;
+  spaceId?: string;
+  projectId?: string;
 }
 
-const title = ref("");
-const description = ref("");
-const priority = ref<TaskPriority>("medium");
-const status = ref<TaskStatus>("pending");
+const spaceStore = useSpacesStore();
 
 const props = defineProps<TaskFormProps>();
 
@@ -26,28 +25,43 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
+const form = reactive({
+  space_id: props.spaceId || props.task?.space_id || "",
+  title: props.task?.title || "",
+  description: props.task?.description || "",
+  priority: (props.task?.priority || "medium") as TaskPriority,
+  status: (props.task?.status || "pending") as TaskStatus,
+});
+
+const availableSpaces = computed(() => {
+  if (!props.projectId) return [];
+  return spaceStore.spaces.filter((s) => s.project_id === props.projectId);
+});
+
 watch(
   () => props.task,
   (newTask) => {
     if (newTask) {
-      title.value = newTask.title;
-      description.value = newTask.description || "";
-      priority.value = newTask.priority;
-      status.value = newTask.status;
+      form.title = newTask.title;
+      form.description = newTask.description || "";
+      form.priority = newTask.priority;
+      form.status = newTask.status;
+      form.space_id = newTask.space_id;
     }
   },
   { immediate: true }
 );
 
 const handleSubmit = () => {
-  if (!title.value.trim()) return;
+  if (!form.title.trim()) return;
+  if (!form.space_id && !props.spaceId) return;
 
   emit("submit", {
-    title: title.value.trim(),
-    description: description.value.trim() || null,
-    priority: priority.value,
-    status: status.value,
-    space_id: props.spaceId,
+    title: form.title.trim(),
+    description: form.description.trim() || null,
+    priority: form.priority,
+    status: form.status,
+    space_id: form.space_id || props.spaceId || "",
 
     // no pedimos por ahora
     category: null,
@@ -61,9 +75,28 @@ const handleSubmit = () => {
 </script>
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-4">
+    <div v-if="!props.spaceId" class="mb-4">
+      <label class="block text-sm font-medium text-slate-700 mb-1">
+        Espacio *
+      </label>
+      <select
+        v-model="form.space_id"
+        class="w-full px-3 py-2 border border-slate-300 rounded-lg"
+        required
+      >
+        <option value="" disabled>Selecciona un espacio</option>
+        <option
+          v-for="space in availableSpaces"
+          :key="space.id"
+          :value="space.id"
+        >
+          {{ space.icon }} {{ space.name }}
+        </option>
+      </select>
+    </div>
     <BaseInput
       label="Título de la tarea"
-      v-model="title"
+      v-model="form.title"
       required
       placeholder="Pintar, llamar fontanero..."
     />
@@ -72,7 +105,7 @@ const handleSubmit = () => {
         Descripción
       </label>
       <textarea
-        v-model="description"
+        v-model="form.description"
         placeholder="Detalles de la tarea..."
         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors resize-none"
         rows="3"
@@ -84,7 +117,7 @@ const handleSubmit = () => {
         Prioridad
       </label>
       <select
-        v-model="priority"
+        v-model="form.priority"
         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
       >
         <option value="low">Baja</option>
@@ -99,7 +132,7 @@ const handleSubmit = () => {
         Estado
       </label>
       <select
-        v-model="status"
+        v-model="form.status"
         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
       >
         <option value="pending">Pendiente</option>
