@@ -116,6 +116,7 @@ const handleDelete = async () => {
         <ProjectStatCard
           icon="📋"
           label="Tareas"
+          :to="`/project/${projectId}/tasks`"
           :value="`${stats.completedTasks} / ${stats.tasksCount}`"
           :subtitle="`${stats.progressPercentage}% completado`"
         />

@@ -18,14 +18,19 @@ const router = createRouter({
       component: ProjectsDetailView,
     },
     {
+      path: "/project/:id/spaces/:spaceId/tasks",
+      name: "projects-tasks",
+      component: TasksView,
+    },
+    {
       path: "/project/:id/spaces",
       name: "projects-spaces",
       component: SpacesView,
     },
     {
-      path: "/project/:id/spaces/:spaceId/tasks",
-      name: "projects-tasks",
-      component: TasksView,
+      path: "/project/:id/tasks",
+      name: "project-tasks",
+      component: () => import("@/views/ProjectTaskView.vue"),
     },
     {
       path: "/components",
