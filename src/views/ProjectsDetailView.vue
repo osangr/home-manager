@@ -12,6 +12,7 @@ import ProjectForm from "@/components/features/projects/ProjectForm.vue";
 import ConfirmDeleteModal from "@/components/ui/ConfirmDeleteModal.vue";
 import type { CreateProject } from "@/types/database";
 import { useModal } from "@/composables/useModal";
+import { useProjectStats } from "@/composables/useProjectStats";
 
 const route = useRoute();
 const router = useRouter();
@@ -20,6 +21,7 @@ const spaceStore = useSpacesStore();
 const taskStore = useTaskStore();
 const editModal = useModal();
 const deleteModal = useModal();
+const { getProjectStats } = useProjectStats();
 
 const projectId = route.params.id as string;
 
@@ -31,18 +33,8 @@ onMounted(async () => {
   ]);
 });
 
-const spacesCount = computed(() => spaceStore.spaces.length);
-const tasksCount = computed(() => taskStore.tasks.length);
-const completedTasks = computed(
-  () => taskStore.tasks.filter((t) => t.status === "completed").length
-);
-
+const stats = computed(() => getProjectStats(projectId));
 const project = computed(() => projectStore.currentProject);
-
-const progressPercentage = computed(() => {
-  if (tasksCount.value === 0) return 0;
-  return Math.round((completedTasks.value / tasksCount.value) * 100);
-});
 
 const handleEdit = async (data: CreateProject) => {
   await projectStore.updateProject(projectId, data);
@@ -117,15 +109,15 @@ const handleDelete = async () => {
         <ProjectStatCard
           icon="📐"
           label="Espacios"
-          :value="spacesCount"
+          :value="stats.spacesCount"
           :to="`/project/${projectId}/spaces`"
         />
 
         <ProjectStatCard
           icon="📋"
           label="Tareas"
-          :value="`${completedTasks} / ${tasksCount}`"
-          :subtitle="`${progressPercentage}% completado`"
+          :value="`${stats.completedTasks} / ${stats.tasksCount}`"
+          :subtitle="`${stats.progressPercentage}% completado`"
         />
       </div>
       <BaseModal
