@@ -3,10 +3,16 @@ import Dashboard from "@/views/Dashboard.vue";
 import ProjectsDetailView from "@/views/ProjectsDetailView.vue";
 import SpacesView from "@/views/SpacesView.vue";
 import TasksView from "@/views/TasksView.vue";
+import { useAuthStore } from "@/stores/authStore";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: "/login",
+      name: "login",
+      component: () => import("@/views/LoginView.vue"),
+    },
     {
       path: "/",
       name: "dashboard",
@@ -38,6 +44,24 @@ const router = createRouter({
       component: () => import("../views/ComponentsView.vue"),
     },
   ],
+});
+
+router.beforeEach(async (to, _from, next) => {
+  const authStore = useAuthStore();
+
+  if (authStore.loading) {
+    await authStore.initialize();
+  }
+
+  if (to.path === "/login" && authStore.isAuthenticated) {
+    return next("/");
+  }
+
+  if (to.path !== "/login" && !authStore.isAuthenticated) {
+    return next("/login");
+  }
+
+  next();
 });
 
 export default router;

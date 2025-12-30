@@ -8,20 +8,3 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-const DEV_MODE = true;
-
-if (DEV_MODE) {
-  supabase.auth
-    .signInWithPassword({
-      email: "dev.user@email.com",
-      password: "!Dev123",
-    })
-    .then(({ error }) => {
-      if (error) {
-        console.error("Error auto-login:", error);
-      } else {
-        console.log("✅ Auto-login exitoso (modo desarrollo)");
-      }
-    });
-}
