@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { RouterLink, useRouter } from "vue-router";
+import BaseButton from "../ui/BaseButton.vue";
+
+const authStore = useAuthStore();
+const router = useRouter();
+const handleLogout = async () => {
+  await authStore.signOut();
+  router.push("/login");
+};
 </script>
 
 <template>
@@ -14,14 +23,14 @@ import { RouterLink } from "vue-router";
         class="text-xl font-bold text-slate-900 hover:text-primary transition-colors"
         >🏠 Home Manager</RouterLink
       >
-      <nav>
-        <ul class="flex gap-3">
-          <RouterLink
-            to="/"
-            class="text-slate-600 hover:text-slate-900 transition-colors"
-            active-class="!text-primary !font-medium"
-            >Dashboard</RouterLink
-          >
+      <nav v-if="authStore.user" class="flex items-center gap-10">
+        <ul>
+          <span> Hola, {{ authStore.user?.email }}!</span>
+        </ul>
+        <ul>
+          <BaseButton variant="secondary" @click="handleLogout">
+            Cerrar sesión
+          </BaseButton>
         </ul>
       </nav>
     </div>
