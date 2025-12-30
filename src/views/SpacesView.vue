@@ -36,6 +36,10 @@ onMounted(async () => {
 
 const project = computed(() => projectStore.currentProject);
 
+const projectSpaces = computed(() => {
+  return spaceStore.spaces.filter((s) => s.project_id === projectId);
+});
+
 const selectedSpace = computed(() =>
   spaceStore.spaces.find((space) => space.id === editModal.selectedItemId.value)
 );
@@ -103,7 +107,7 @@ const handleViewTasks = (id: string) => {
     </div>
 
     <!-- Lista vacía -->
-    <div v-else-if="spaceStore.spaces.length === 0" class="text-center py-12">
+    <div v-else-if="projectSpaces.length === 0" class="text-center py-12">
       <p class="text-slate-600 mb-4">No hay espacios todavía</p>
       <BaseButton @click="createModal.open()" variant="primary">
         Crear primer espacio
@@ -113,7 +117,7 @@ const handleViewTasks = (id: string) => {
     <!-- Grid de espacios -->
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <SpaceCard
-        v-for="space in spaceStore.spaces"
+        v-for="space in projectSpaces"
         :key="space.id"
         :space="space"
         v-bind="getSpaceStats(space.id)"

@@ -45,10 +45,9 @@ export const useTaskStore = defineStore("task", () => {
 
       const spaceIds = spacesData?.map((s) => s.id) || [];
 
-      if (spaceIds.length === 0) {
-        tasks.value = [];
-        return;
-      }
+      tasks.value = tasks.value.filter((t) => !spaceIds.includes(t.space_id));
+
+      if (spaceIds.length === 0) return;
 
       const { data, error: fetchError } = await supabase
         .from("tasks")
@@ -58,7 +57,7 @@ export const useTaskStore = defineStore("task", () => {
 
       if (fetchError) throw fetchError;
 
-      tasks.value = data || [];
+      if (data) tasks.value.push(...data);
     } catch (err) {
       error.value = (err as Error).message;
     } finally {

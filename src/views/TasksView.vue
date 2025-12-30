@@ -36,15 +36,21 @@ const currentSpace = computed(() =>
 
 // Computed para filtrar tareas por status
 const pendingTasks = computed(() =>
-  taskStore.tasks.filter((t) => t.status === "pending")
+  taskStore.tasks.filter(
+    (t) => t.space_id === spaceId && t.status === "pending"
+  )
 );
 
 const inProgressTasks = computed(() =>
-  taskStore.tasks.filter((t) => t.status === "in_progress")
+  taskStore.tasks.filter(
+    (t) => t.space_id === spaceId && t.status === "in_progress"
+  )
 );
 
 const completedTasks = computed(() =>
-  taskStore.tasks.filter((t) => t.status === "completed")
+  taskStore.tasks.filter(
+    (t) => t.space_id === spaceId && t.status === "completed"
+  )
 );
 
 const selectedTask = computed(() =>

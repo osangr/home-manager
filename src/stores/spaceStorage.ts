@@ -23,7 +23,9 @@ export const useSpacesStore = defineStore("space", () => {
         throw fetchError;
       }
 
-      spaces.value = data || [];
+      spaces.value = spaces.value.filter((s) => s.project_id !== projectId);
+
+      if (data) spaces.value.push(...data);
     } catch (err) {
       error.value = (err as Error).message;
     } finally {
