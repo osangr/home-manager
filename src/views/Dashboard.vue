@@ -2,6 +2,8 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useProjectStore } from "@/stores/projectStore";
+import { useSpacesStore } from "@/stores/spaceStorage";
+import { useTaskStore } from "@/stores/taskStore";
 import ProjectCard from "@/components/features/projects/ProjectCard.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
@@ -11,11 +13,40 @@ import type { CreateProject } from "@/types/database";
 const isModalOpen = ref(false);
 
 const projectStore = useProjectStore();
+const spaceStore = useSpacesStore();
+const taskStore = useTaskStore();
 const router = useRouter();
 
 onMounted(async () => {
   await projectStore.fetchProjects();
+
+  const projectIds = projectStore.projects.map((p) => p.id);
+
+  await Promise.all(
+    projectIds.map(async (id) => {
+      await spaceStore.fetchSpacesByProject(id);
+      await taskStore.fetchTasksByProject(id);
+    })
+  );
 });
+
+const getProjectSpacesCount = (projectId: string) => {
+  return spaceStore.spaces.filter((s) => s.project_id === projectId).length;
+};
+
+const getProjectTasksCount = (projectId: string) => {
+  return taskStore.tasks.filter((t) => {
+    const space = spaceStore.spaces.find((s) => s.id === t.space_id);
+    return space?.project_id === projectId;
+  }).length;
+};
+
+const getProjectCompletedTasksCount = (projectId: string) => {
+  return taskStore.tasks.filter((t) => {
+    const space = spaceStore.spaces.find((s) => s.id === t.space_id);
+    return space?.project_id === projectId && t.status === "completed";
+  }).length;
+};
 
 const handleView = (id: string) => {
   router.push(`/project/${id}`);
@@ -53,9 +84,9 @@ const handleProjectCreated = async (data: CreateProject) => {
         v-for="project in projectStore.projects"
         :key="project.id"
         :project="project"
-        :spaces-count="5"
-        :tasks-count="15"
-        :completed-tasks="9"
+        :spaces-count="getProjectSpacesCount(project.id)"
+        :tasks-count="getProjectTasksCount(project.id)"
+        :completed-tasks="getProjectCompletedTasksCount(project.id)"
         @view="handleView"
         @spaces="handleSpaces"
         @tasks="handleTasks"
