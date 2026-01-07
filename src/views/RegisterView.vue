@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter, RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import BaseInput from "@/components/ui/BaseInput.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
@@ -11,8 +11,8 @@ const authStore = useAuthStore();
 const email = ref("");
 const password = ref("");
 
-const handleLogin = async () => {
-  const result = await authStore.signIn(email.value, password.value);
+const handleRegister = async () => {
+  const result = await authStore.signUp(email.value, password.value);
 
   if (result.success) {
     router.push("/");
@@ -25,10 +25,10 @@ const handleLogin = async () => {
     <div class="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-slate-900 mb-2">🏠 Home Manager</h1>
-        <p class="text-slate-600">Inicia sesión para continuar</p>
+        <p class="text-slate-600">Registrate para continuar</p>
       </div>
 
-      <form @submit.prevent="handleLogin" class="space-y-4">
+      <form @submit.prevent="handleRegister" class="space-y-4">
         <BaseInput label="Email" v-model="email" type="email" required />
 
         <BaseInput
@@ -53,14 +53,14 @@ const handleLogin = async () => {
           :disabled="authStore.loading"
           class="w-full"
         >
-          {{ authStore.loading ? "Cargando..." : "Iniciar sesión" }}
+          {{ authStore.loading ? "Cargando..." : "Regístrarse" }}
         </BaseButton>
       </form>
 
       <p class="text-center text-sm text-slate-600 mt-6">
-        ¿No tienes cuenta?
-        <RouterLink to="/register" class="text-primary font-medium">
-          Regístrate
+        ¿Ya tienes una cuenta?
+        <RouterLink to="/login" class="text-primary font-medium">
+          Iniciar sesión
         </RouterLink>
       </p>
     </div>

@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import("@/views/LoginView.vue"),
     },
     {
+      path: "/register",
+      name: "register",
+      component: () => import("@/views/RegisterView.vue"),
+    },
+    {
       path: "/",
       name: "dashboard",
       component: Dashboard,
@@ -53,11 +58,14 @@ router.beforeEach(async (to, _from, next) => {
     await authStore.initialize();
   }
 
-  if (to.path === "/login" && authStore.isAuthenticated) {
+  const publicRoutes = ["/login", "/register"];
+  const isPublicRoute = publicRoutes.includes(to.path);
+
+  if (isPublicRoute && authStore.isAuthenticated) {
     return next("/");
   }
 
-  if (to.path !== "/login" && !authStore.isAuthenticated) {
+  if (!isPublicRoute && !authStore.isAuthenticated) {
     return next("/login");
   }
 
