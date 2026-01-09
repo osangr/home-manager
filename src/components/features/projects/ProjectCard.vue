@@ -1,18 +1,26 @@
 <template>
   <BaseCard hoverable class="h-full flex flex-col justify-between">
     <div>
-      <h3 class="text-lg font-semibold mb-2">{{ project.name }}</h3>
+      <h3 class="text-lg font-semibold mb-1">{{ project.name }}</h3>
       <p v-if="project.description" class="text-sm text-slate-600 mb-4">
         {{ project.description }}
       </p>
     </div>
     <div class="mt-auto">
-      <div class="flex items-center gap-4 text-sm text-slate-600 mb-4">
-        <span>💰 {{ formatCurrency(project.total_budget) }}</span>
+      <div
+        class="flex items-center justify-around gap-2 text-sm text-slate-600 mb-4"
+      >
+        <p class="flex flex-col items-center">
+          <span>💰</span> {{ formatCurrency(project.total_budget) }}
+        </p>
         <span class="text-slate-300">|</span>
-        <span>📐 {{ spacesCount }} espacios</span>
+        <p class="flex flex-col items-center">
+          <span>📐</span> {{ spacesCount }} espacios
+        </p>
         <span class="text-slate-300">|</span>
-        <span>📋 {{ tasksCount }} tareas</span>
+        <p class="flex flex-col items-center">
+          <span>📋</span> {{ tasksCount }} tareas
+        </p>
       </div>
       <div class="space-y-1 mb-4">
         <div class="w-full bg-slate-200 rounded-full h-2">
@@ -25,7 +33,7 @@
           {{ progressPercentage }}% completado
         </p>
       </div>
-      <div class="flex justify-between">
+      <div class="flex lg:justify-between flex-col lg:flex-row gap-2">
         <BaseButton
           size="small"
           @click="emit('view', project.id)"
