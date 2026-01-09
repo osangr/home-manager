@@ -74,10 +74,10 @@ const handleProjectCreated = async (data: CreateProject) => {
         @tasks="handleTasks"
       />
     </div>
+    <BaseButton class="mt-6" @click="handleModal" variant="primary">
+      Crear Nuevo Proyecto
+    </BaseButton>
   </div>
-  <BaseButton class="mt-6" @click="handleModal" variant="primary">
-    Crear Nuevo Proyecto
-  </BaseButton>
   <BaseModal
     :is-open="isModalOpen"
     title="Crear Nuevo Proyecto"
