@@ -20,13 +20,11 @@ const handleLogout = async () => {
     >
       <RouterLink
         to="/"
-        class="text-xl font-bold text-slate-900 hover:text-primary transition-colors"
-        >🏠 Home Manager</RouterLink
+        class="text-lg font-bold text-slate-900 hover:text-primary transition-colors flex flex-col items-center"
       >
-      <nav v-if="authStore.user" class="flex items-center gap-10">
-        <ul>
-          <span> Hola, {{ authStore.user?.email }}!</span>
-        </ul>
+        <span>🏠</span> Home Manager</RouterLink
+      >
+      <nav class="flex items-center gap-10">
         <ul>
           <BaseButton variant="secondary" @click="handleLogout">
             Cerrar sesión

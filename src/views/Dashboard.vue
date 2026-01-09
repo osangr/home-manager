@@ -58,7 +58,6 @@ const handleProjectCreated = async (data: CreateProject) => {
 
 <template>
   <div class="p-8">
-    <h1 class="text-3xl font-semibold mb-3">Dashboard</h1>
     <div v-if="projectStore.loading">Cargando proyectos...</div>
     <div v-else-if="projectStore.projects.length === 0">
       No tienes proyectos todavía.
@@ -74,10 +73,10 @@ const handleProjectCreated = async (data: CreateProject) => {
         @tasks="handleTasks"
       />
     </div>
+    <BaseButton class="mt-6" @click="handleModal" variant="primary">
+      Crear Nuevo Proyecto
+    </BaseButton>
   </div>
-  <BaseButton class="mt-6" @click="handleModal" variant="primary">
-    Crear Nuevo Proyecto
-  </BaseButton>
   <BaseModal
     :is-open="isModalOpen"
     title="Crear Nuevo Proyecto"
