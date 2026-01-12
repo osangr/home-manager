@@ -1,5 +1,9 @@
 <template>
-  <BaseCard hoverable class="h-full flex flex-col justify-between">
+  <BaseCard
+    hoverable
+    class="h-full flex flex-col justify-between"
+    @click="handleClick"
+  >
     <div>
       <h3 class="text-lg font-semibold mb-1">{{ project.name }}</h3>
       <p v-if="project.description" class="text-sm text-slate-600 mb-4">
@@ -33,14 +37,10 @@
           {{ progressPercentage }}% completado
         </p>
       </div>
-      <div class="flex lg:justify-between flex-col lg:flex-row gap-2">
-        <BaseButton
-          size="small"
-          @click="emit('view', project.id)"
-          variant="primary"
-        >
-          Ver Proyecto
-        </BaseButton>
+      <div
+        class="flex lg:justify-between flex-col lg:flex-row gap-2"
+        @click.stop
+      >
         <BaseButton
           size="small"
           variant="secondary"
@@ -86,6 +86,10 @@ const progressPercentage = computed(() => {
   if (props.tasksCount === 0) return 0;
   return Math.round((props.completedTasks / props.tasksCount) * 100);
 });
+
+const handleClick = () => {
+  emit("view", props.project.id);
+};
 </script>
 
 <style scoped></style>
