@@ -2,6 +2,7 @@
 import { useAuthStore } from "@/stores/authStore";
 import { RouterLink, useRouter } from "vue-router";
 import BaseButton from "../ui/BaseButton.vue";
+import Icon from "/favicon.png";
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -22,7 +23,10 @@ const handleLogout = async () => {
         to="/"
         class="text-lg font-bold text-slate-900 hover:text-primary transition-colors flex flex-col items-center"
       >
-        <span>🏠</span> Home Manager</RouterLink
+        <span
+          ><img :src="Icon" alt="Home Manager Icon" class="w-8 h-8 mr-2 mt-1"
+        /></span>
+        Home Manager</RouterLink
       >
       <nav class="flex items-center gap-10">
         <ul>
