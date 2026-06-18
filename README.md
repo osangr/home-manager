@@ -79,7 +79,7 @@ npm install
 Crea un archivo `.env` en la raíz:
 ```env
 VITE_SUPABASE_URL=tu_supabase_url
-VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
+VITE_SUPABASE_KEY=tu_supabase_anon_key
 ```
 
 4. Ejecutar en desarrollo
